@@ -1,4 +1,4 @@
-package eu.h2020.symbiote.elpois;
+package eu.h2020.symbiote.smeur.elpois;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

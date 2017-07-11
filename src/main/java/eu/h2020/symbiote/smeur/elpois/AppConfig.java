@@ -1,4 +1,4 @@
-package eu.h2020.symbiote.elpois;
+package eu.h2020.symbiote.smeur.elpois;
 
 /**
  * Created by mateuszl on 30.09.2016.
