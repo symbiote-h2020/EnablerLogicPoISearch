@@ -69,6 +69,7 @@ public class PoiSearchConsumer extends DefaultConsumer {
 			//from http-response bounding-box coordinates are parsed and sent to overpass-api
 			//overpass-api returns requested PoIs
 			JSONObject jsonResponse = new JSONObject( jsonLocation );
+			
 			final String geodata = (String) jsonResponse.get("boundingbox").toString();
 			
 			String [] geo = geodata.substring(1,geodata.length()-2).replaceAll("\"", "").split(",");
