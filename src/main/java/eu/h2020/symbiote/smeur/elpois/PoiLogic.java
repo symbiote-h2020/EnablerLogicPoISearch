@@ -74,8 +74,12 @@ public class PoiLogic implements ProcessingLogic {
 	private void registerResources() {
 		List<CloudResource> cloudResources = new LinkedList<>();
 		cloudResources.add(createServiceResource("23"));
+		
+		//Check if working ?
+		rhClientService.registerResources(cloudResources);
 	}
 
+	//set IPs
 	private CloudResource createServiceResource(String internalId) {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
