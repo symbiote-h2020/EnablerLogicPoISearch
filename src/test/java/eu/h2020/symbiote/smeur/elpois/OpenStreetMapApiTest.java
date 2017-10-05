@@ -82,35 +82,35 @@ public class OpenStreetMapApiTest {
 		}
 	}
 	
-	@Test
-	public void testResultParsingName(){
-		String response = null;
-		
-		try {
-			response = HttpCommunication.sendGetHttpRequest(overpassURL1+dummyRequestParameters);
-		} catch (Exception e) {
-			System.out.println("Response not received while testing parsing of result!");
-			e.printStackTrace();
-		}
-		
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
-		try {
-			builder = factory.newDocumentBuilder();
-			Document document = builder.parse( new InputSource( new StringReader(response) ) );
-			NodeList nl = document.getElementsByTagName("node");
-			NodeList children = nl.item(1).getChildNodes();
-			boolean nameExists = false;
-			for (int j = 0; j < children.getLength(); j++) {
-	        	
-	        	if(children.item(j).getNodeName().equals("tag") && children.item(j).getAttributes().getNamedItem("k").toString().contains("name")){
-	        		nameExists = true;
-	        	}
-	        }
-			assertTrue(nameExists);
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	@Test
+//	public void testResultParsingName(){
+//		String response = null;
+//		
+//		try {
+//			response = HttpCommunication.sendGetHttpRequest(overpassURL1+dummyRequestParameters);
+//		} catch (Exception e) {
+//			System.out.println("Response not received while testing parsing of result!");
+//			e.printStackTrace();
+//		}
+//		
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//		DocumentBuilder builder;
+//		try {
+//			builder = factory.newDocumentBuilder();
+//			Document document = builder.parse( new InputSource( new StringReader(response) ) );
+//			NodeList nl = document.getElementsByTagName("node");
+//			NodeList children = nl.item(1).getChildNodes();
+//			boolean nameExists = false;
+//			for (int j = 0; j < children.getLength(); j++) {
+//	        	
+//	        	if(children.item(j).getNodeName().equals("tag") && children.item(j).getAttributes().getNamedItem("k").toString().contains("name")){
+//	        		nameExists = true;
+//	        	}
+//	        }
+//			assertTrue(nameExists);
+//		} catch (ParserConfigurationException | SAXException | IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 }
