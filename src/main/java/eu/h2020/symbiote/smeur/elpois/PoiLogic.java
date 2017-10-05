@@ -76,7 +76,8 @@ public class PoiLogic implements ProcessingLogic {
 		cloudResources.add(createServiceResource("23"));
 		
 		//Check if working ?
-		rhClientService.registerResources(cloudResources);
+		log.info("starting the registration of resources...");
+		//rhClientService.registerResources(cloudResources);
 	}
 
 	//set IPs
@@ -154,10 +155,10 @@ public class PoiLogic implements ProcessingLogic {
 					log.info("Response from overpass-api received: " + osmResponse);
 					QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
 					// contact interpolator to fetch interpolated data
+					//INTEGRATION TEST WITH INTERPOLATOR
 					QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
 							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
 					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
-
 				} catch (Exception e) {
 					log.info("HTTP communication with OSM overpass-api failed!");
 					e.printStackTrace();
@@ -199,6 +200,7 @@ public class PoiLogic implements ProcessingLogic {
 				// l.getLongitude());
 				interpolatorQueryMap.put(UUID.randomUUID().toString(), l);
 			}
+			log.info("XML document parsed, and map for interpolator ready!");
 			return interpolatorQueryMap;
 		} catch (SAXException | IOException | ParserConfigurationException e) {
 			log.info("Exception while parsing OpenStreetMap (overpass-api) XML response!");
