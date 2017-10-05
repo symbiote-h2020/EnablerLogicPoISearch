@@ -42,6 +42,8 @@ import eu.h2020.symbiote.core.model.resources.Service;
 import eu.h2020.symbiote.cloud.model.data.observation.Location;
 import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
 import eu.h2020.symbiote.enabler.messaging.model.EnablerLogicDataAppearedMessage;
+import eu.h2020.symbiote.enabler.messaging.model.NotEnoughResourcesAvailable;
+import eu.h2020.symbiote.enabler.messaging.model.ResourcesUpdated;
 
 @Component
 public class PoiLogic implements ProcessingLogic {
@@ -68,6 +70,11 @@ public class PoiLogic implements ProcessingLogic {
 
 	@Override
 	public void measurementReceived(EnablerLogicDataAppearedMessage arg0) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void resourcesUpdated(ResourcesUpdated arg0){
 		// TODO Auto-generated method stub
 	}
 
@@ -229,6 +236,11 @@ public class PoiLogic implements ProcessingLogic {
 			formatedResponse.add(place);
 		}
 		return formatedResponse;
+	}
+
+	@Override
+	public void notEnoughResources(NotEnoughResourcesAvailable arg0) {
+		// TODO Auto-generated method stub		
 	}
 
 }
