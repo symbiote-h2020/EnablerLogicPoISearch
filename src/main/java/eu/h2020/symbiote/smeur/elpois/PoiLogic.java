@@ -163,9 +163,14 @@ public class PoiLogic implements ProcessingLogic {
 					QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
 					// contact interpolator to fetch interpolated data
 					//INTEGRATION TEST WITH INTERPOLATOR
+					try{
 					QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
 							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
 					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
+					} catch (Exception e){
+						log.info("ERROR OCCURED IN POI-INTERPOLATOR COMMUNICATION!");
+						return new Result<>(false, null, "error occured!");
+					}
 				} catch (Exception e) {
 					log.info("HTTP communication with OSM overpass-api failed!");
 					e.printStackTrace();
