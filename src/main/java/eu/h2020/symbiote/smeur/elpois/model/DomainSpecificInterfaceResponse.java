@@ -54,9 +54,10 @@ public class DomainSpecificInterfaceResponse {
 	public void setObservation(List<ObservationValue> observation) {
 		this.observation = observation;
 	}
-	
-	
-	
-	
 
+	@Override
+	public String toString() {
+		return "DomainSpecificInterfaceResponse [latitude=" + latitude + ", longitude=" + longitude + ", name=" + name
+				+ ", observation=" + observation + "]";
+	}
 }
