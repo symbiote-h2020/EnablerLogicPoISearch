@@ -72,22 +72,22 @@ public class PoiLogic implements ProcessingLogic {
 	public void measurementReceived(EnablerLogicDataAppearedMessage arg0) {
 		// TODO Auto-generated method stub
 	}
-	
+
 	@Override
-	public void resourcesUpdated(ResourcesUpdated arg0){
+	public void resourcesUpdated(ResourcesUpdated arg0) {
 		// TODO Auto-generated method stub
 	}
 
 	private void registerResources() {
 		List<CloudResource> cloudResources = new LinkedList<>();
 		cloudResources.add(createServiceResource("23"));
-		
-		//Check if working ?
+
+		// Check if working ?
 		log.info("starting the registration of resources...");
-		//rhClientService.registerResources(cloudResources);
+		// rhClientService.registerResources(cloudResources);
 	}
 
-	//set IPs
+	// set IPs
 	private CloudResource createServiceResource(String internalId) {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
@@ -162,10 +162,11 @@ public class PoiLogic implements ProcessingLogic {
 					log.info("Response from overpass-api received: " + osmResponse);
 					QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
 					// contact interpolator to fetch interpolated data
-					//INTEGRATION TEST WITH INTERPOLATOR
+					// INTEGRATION TEST WITH INTERPOLATOR
 					QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
 							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
 					log.info("RPC communication with Interpolator successful!");
+					log.info("Received response :" + response.toString());
 					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
 
 				} catch (Exception e) {
@@ -230,20 +231,22 @@ public class PoiLogic implements ProcessingLogic {
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
 
-			for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
-					.get(entry.getKey()).interpolatedValues.entrySet()) {
-				observations.add(e.getValue());
-			}
+			if (interpolatorResponse.theData.get(entry.getKey()).interpolatedValues.entrySet() != null) {
+				for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
+						.get(entry.getKey()).interpolatedValues.entrySet()) {
+					observations.add(e.getValue());
+				}
+			} else
+				log.info("Interpolated values are null!");
 			place.setObservation(observations);
 			formatedResponse.add(place);
-			log.info("ADDED TO RESPONSE LIST: " + place.toString());
 		}
 		return formatedResponse;
 	}
 
 	@Override
 	public void notEnoughResources(NotEnoughResourcesAvailable arg0) {
-		// TODO Auto-generated method stub		
+		// TODO Auto-generated method stub
 	}
 
 }
