@@ -230,14 +230,14 @@ public class PoiLogic implements ProcessingLogic {
 			place.setLatitude(String.valueOf(entry.getValue().getLatitude()));
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
-
-			if (interpolatorResponse.theData.get(entry.getKey()).interpolatedValues.entrySet() != null) {
-				for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
-						.get(entry.getKey()).interpolatedValues.entrySet()) {
-					observations.add(e.getValue());
-				}
-			} else
-				log.info("Interpolated values are null!");
+			try{
+			for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
+					.get(entry.getKey()).interpolatedValues.entrySet()) {
+				observations.add(e.getValue());
+			}
+			} catch (NullPointerException e){
+				log.info("Error occurred! Interpolator doesnt have any data for requested POIs.");
+			}
 			place.setObservation(observations);
 			formatedResponse.add(place);
 		}
