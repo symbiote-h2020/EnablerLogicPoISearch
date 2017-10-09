@@ -160,13 +160,14 @@ public class PoiLogic implements ProcessingLogic {
 							.sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox=" + westBound
 									+ "," + southBound + "," + eastBound + "," + northBound + "]");
 					log.info("Response from overpass-api received: " + osmResponse);
+
 					QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
+
 					// contact interpolator to fetch interpolated data
-					// INTEGRATION TEST WITH INTERPOLATOR
 					QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
 							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
-					log.info("RPC communication with Interpolator successful!");
-					log.info("Received response :" + response.toString());
+					log.info("RPC communication with Interpolator successful! Received response: "
+							+ response.toString());
 					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
 
 				} catch (Exception e) {
@@ -189,10 +190,6 @@ public class PoiLogic implements ProcessingLogic {
 			for (int i = 0; i < nl.getLength(); i++) {
 
 				Location l = new Location();
-				// log.info("->lat:
-				// "+nl.item(i).getAttributes().getNamedItem("lat").getNodeValue());
-				// log.info("->lat:
-				// "+nl.item(i).getAttributes().getNamedItem("lon").getNodeValue());
 				l.setLatitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()));
 				l.setLongitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()));
 				l.setDescription(amenity);
@@ -202,7 +199,6 @@ public class PoiLogic implements ProcessingLogic {
 
 					if (children.item(j).getNodeName().equals("tag")
 							&& children.item(j).getAttributes().getNamedItem("k").toString().contains("name")) {
-						// log.info("->"+children.item(j).getAttributes().getNamedItem("v"));
 						l.setId(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
 					}
 				}
@@ -226,18 +222,23 @@ public class PoiLogic implements ProcessingLogic {
 
 		for (Map.Entry<String, Location> entry : interpolatorQuery.thePoints.entrySet()) {
 			DomainSpecificInterfaceResponse place = new DomainSpecificInterfaceResponse();
-			place.setName(entry.getValue().getName());
+			place.setName(entry.getValue().getId());
 			place.setLatitude(String.valueOf(entry.getValue().getLatitude()));
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
-			try{
-			for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
-					.get(entry.getKey()).interpolatedValues.entrySet()) {
-				observations.add(e.getValue());
-			}
-			} catch (NullPointerException e){
+
+			log.info("error reason: "+interpolatorResponse.theData.get(entry.getKey()).errorReason);
+			log.info("poiID: "+interpolatorResponse.theData.get(entry.getKey()).poiID);
+			
+			try {
+				for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
+						.get(entry.getKey()).interpolatedValues.entrySet()) {
+					observations.add(e.getValue());
+				}
+			} catch (NullPointerException e) {
 				log.info("Error occurred! Interpolator doesnt have any data for requested POIs.");
 			}
+			
 			place.setObservation(observations);
 			formatedResponse.add(place);
 		}
