@@ -92,7 +92,7 @@ public class PoiLogic implements ProcessingLogic {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
 		cloudResource.setPluginId(props.getEnablerName());
-		cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
+		//cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
 
 		Service service = new Service();
 		cloudResource.setResource(service);
@@ -228,8 +228,7 @@ public class PoiLogic implements ProcessingLogic {
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
 
 			log.info("error reason: "+interpolatorResponse.theData.get(entry.getKey()).errorReason);
-			log.info("poiID: "+interpolatorResponse.theData.get(entry.getKey()).poiID);
-			
+			log.info("poiID: "+interpolatorResponse.theData.get(entry.getKey()).poiID);			
 			try {
 				for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
 						.get(entry.getKey()).interpolatedValues.entrySet()) {
