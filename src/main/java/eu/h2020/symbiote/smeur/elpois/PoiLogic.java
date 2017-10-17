@@ -179,7 +179,7 @@ public class PoiLogic implements ProcessingLogic {
 		});
 	}
 
-	private Map<String, Location> parseOsmXml(String inputXml, String amenity) {
+	public Map<String, Location> parseOsmXml(String inputXml, String amenity) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
 			Map<String, Location> interpolatorQueryMap = new HashMap<String, Location>();
