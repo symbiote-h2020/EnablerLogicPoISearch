@@ -202,11 +202,8 @@ public class PoiLogic implements ProcessingLogic {
 						l.setId(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
 					}
 				}
-				// log.info(l.getId() + " : " + l.getLatitude() + " : " +
-				// l.getLongitude());
 				interpolatorQueryMap.put(UUID.randomUUID().toString(), l);
 			}
-			log.info("XML document parsed, and map for interpolator ready!");
 			return interpolatorQueryMap;
 		} catch (SAXException | IOException | ParserConfigurationException e) {
 			log.info("Exception while parsing OpenStreetMap (overpass-api) XML response!");
@@ -215,7 +212,7 @@ public class PoiLogic implements ProcessingLogic {
 		}
 	}
 
-	private List<DomainSpecificInterfaceResponse> formatResponse(QueryPoiInterpolatedValues interpolatorQuery,
+	public List<DomainSpecificInterfaceResponse> formatResponse(QueryPoiInterpolatedValues interpolatorQuery,
 			QueryPoiInterpolatedValuesResponse interpolatorResponse) {
 
 		List<DomainSpecificInterfaceResponse> formatedResponse = new LinkedList<DomainSpecificInterfaceResponse>();
