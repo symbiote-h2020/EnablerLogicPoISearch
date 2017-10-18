@@ -84,6 +84,11 @@ public class PoiLogic implements ProcessingLogic {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void notEnoughResources(NotEnoughResourcesAvailable arg0) {
+		// TODO Auto-generated method stub
+	}
+
 	private void registerResources() {
 		List<CloudResource> cloudResources = new LinkedList<>();
 		cloudResources.add(createServiceResource("23"));
@@ -98,7 +103,7 @@ public class PoiLogic implements ProcessingLogic {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
 		cloudResource.setPluginId(props.getEnablerName());
-		//cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
+		// cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
 
 		Service service = new Service();
 		cloudResource.setResource(service);
@@ -162,8 +167,8 @@ public class PoiLogic implements ProcessingLogic {
 
 				try {
 					// contact OSM-api to fetch queried PoIs
-					String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox=" + westBound
-									+ "," + southBound + "," + eastBound + "," + northBound + "]");
+					String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox="
+							+ westBound + "," + southBound + "," + eastBound + "," + northBound + "]");
 					log.info("Response from overpass-api received: " + osmResponse);
 
 					QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
@@ -229,8 +234,8 @@ public class PoiLogic implements ProcessingLogic {
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
 
-			log.info("error reason: "+interpolatorResponse.theData.get(entry.getKey()).errorReason);
-			log.info("poiID: "+interpolatorResponse.theData.get(entry.getKey()).poiID);			
+			log.info("error reason: " + interpolatorResponse.theData.get(entry.getKey()).errorReason);
+			log.info("poiID: " + interpolatorResponse.theData.get(entry.getKey()).poiID);
 			try {
 				for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
 						.get(entry.getKey()).interpolatedValues.entrySet()) {
@@ -239,38 +244,33 @@ public class PoiLogic implements ProcessingLogic {
 			} catch (NullPointerException e) {
 				log.info("Error occurred! Interpolator doesnt have any data for requested POIs.");
 			}
-			
+
 			place.setObservation(observations);
 			formatedResponse.add(place);
 		}
 		return formatedResponse;
 	}
 
-	@Override
-	public void notEnoughResources(NotEnoughResourcesAvailable arg0) {
-		// TODO Auto-generated method stub
+	public static String sendGetHttpRequest(String address) throws Exception {
+		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+		factory.setConnectTimeout(5000);
+
+		URI uri = new URI(address);
+		HttpMethod method = HttpMethod.GET;
+		ClientHttpRequest request = factory.createRequest(uri, method);
+		ClientHttpResponse response = request.execute();
+
+		BufferedReader rdr = new BufferedReader(new InputStreamReader(response.getBody()));
+
+		StringBuilder builder = new StringBuilder();
+		String responseString = "";
+
+		while ((responseString = rdr.readLine()) != null) {
+			builder.append(responseString);
+		}
+
+		String result = builder.toString();
+		return result;
 	}
-	
-	public static String sendGetHttpRequest(String address) throws Exception{
-    	SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);
-        
-        URI uri = new URI(address);
-        HttpMethod method = HttpMethod.GET;
-        ClientHttpRequest request = factory.createRequest(uri, method);
-        ClientHttpResponse response = request.execute();
-        
-        BufferedReader rdr = new BufferedReader(new InputStreamReader(response.getBody()));
-        
-        StringBuilder builder = new StringBuilder();
-        String responseString = "";
-
-        while ((responseString = rdr.readLine()) != null) {
-            builder.append(responseString);
-        }
-
-        String result = builder.toString();
-        return result;
-    }
 
 }

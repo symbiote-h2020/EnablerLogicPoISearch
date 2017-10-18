@@ -7,20 +7,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
 
 public class DomainSpecificInterfaceResponse {
-	
+
 	@JsonProperty
 	private String latitude;
-	
+
 	@JsonProperty
 	private String longitude;
-	
+
 	@JsonProperty
 	private String name;
-	
+
 	@JsonProperty
 	private List<ObservationValue> observation;
-	
-	public DomainSpecificInterfaceResponse(){
+
+	public DomainSpecificInterfaceResponse() {
 	}
 
 	public String getLatitude() {

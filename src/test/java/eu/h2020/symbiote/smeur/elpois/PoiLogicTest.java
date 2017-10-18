@@ -3,13 +3,11 @@ package eu.h2020.symbiote.smeur.elpois;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -21,13 +19,11 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import eu.h2020.symbiote.cloud.model.data.observation.Location;
 import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
 import eu.h2020.symbiote.cloud.model.data.observation.Property;
 import eu.h2020.symbiote.cloud.model.data.observation.UnitOfMeasurement;
-import eu.h2020.symbiote.cloud.model.data.parameter.InputParameter;
 import eu.h2020.symbiote.cloud.model.internal.CloudResource;
 import eu.h2020.symbiote.core.model.resources.Service;
 import eu.h2020.symbiote.enablerlogic.EnablerLogic;
@@ -35,7 +31,6 @@ import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicPropertie
 import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
 import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.PoIInformation;
-import eu.h2020.symbiote.smeur.messages.QueryInterpolatedStreetSegmentList;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
 
@@ -43,7 +38,7 @@ public class PoiLogicTest {
 
 	@Mock
 	EnablerLogicProperties props;
-	
+
 	@Mock
 	RapPlugin rapPlugin;
 
@@ -59,7 +54,8 @@ public class PoiLogicTest {
 
 		MockitoAnnotations.initMocks(this);
 		when(props.getEnablerName()).thenReturn("Foo");
-		when(elMock.sendSyncMessageToEnablerLogic(any(String.class), any(QueryPoiInterpolatedValues.class), any(Class.class))).thenReturn(new QueryPoiInterpolatedValuesResponse());
+		when(elMock.sendSyncMessageToEnablerLogic(any(String.class), any(QueryPoiInterpolatedValues.class),
+				any(Class.class))).thenReturn(new QueryPoiInterpolatedValuesResponse());
 	}
 
 	@Test
