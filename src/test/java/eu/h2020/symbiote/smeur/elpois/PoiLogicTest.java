@@ -1,6 +1,5 @@
 package eu.h2020.symbiote.smeur.elpois;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
@@ -25,44 +24,45 @@ import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
 
 public class PoiLogicTest {
-	
 
 	PoiLogic poi;
+
 	EnablerLogic elMock;
-	
+
 	@Before
 	public void setUp() throws Exception {
-		poi=new PoiLogic();
-		elMock=mock(EnablerLogic.class);
+		poi = new PoiLogic();
+		elMock = mock(EnablerLogic.class);
 	}
-	
+
 	@Test
-	public void testParseXml(){
+	public void testParseXml() {
+
 		assertNotNull(getFile("osmResponse.xml"));
-		Map<String,Location> map = poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital");
+
+		Map<String, Location> map = poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital");
 		assertEquals(3, map.size());
 
 		for (Map.Entry<String, Location> entry : map.entrySet()) {
-			if(entry.getValue().getId().equals("Ambulanta Blatine")){
+			if (entry.getValue().getId().equals("Ambulanta Blatine")) {
 				assertEquals(43.5063291, entry.getValue().getLatitude(), 0);
 				assertEquals(16.4603236, entry.getValue().getLongitude(), 0);
-			}
-			else if(entry.getValue().getId().equals("Splitske toplice")){
+			} else if (entry.getValue().getId().equals("Splitske toplice")) {
 				assertEquals(43.5090209, entry.getValue().getLatitude(), 0);
 				assertEquals(16.4370730, entry.getValue().getLongitude(), 0);
-			}
-			else if(entry.getValue().getId().equals("Salus ST")){
+			} else if (entry.getValue().getId().equals("Salus ST")) {
 				assertEquals(43.5065924, entry.getValue().getLatitude(), 0);
 				assertEquals(16.4738638, entry.getValue().getLongitude(), 0);
 			}
 		}
 	}
-	
+
 	@Test
-	public void testFormatResponse(){
-		QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital"));
+	public void testFormatResponse() {
+		QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(
+				poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital"));
 		QueryPoiInterpolatedValuesResponse interpolatorResponse = new QueryPoiInterpolatedValuesResponse();
-		interpolatorResponse.theData = new HashMap<String,PoIInformation>();
+		interpolatorResponse.theData = new HashMap<String, PoIInformation>();
 		for (Map.Entry<String, Location> entry : qiv.thePoints.entrySet()) {
 			interpolatorResponse.theData.put(entry.getKey(), new PoIInformation());
 		}
@@ -70,28 +70,32 @@ public class PoiLogicTest {
 		for (int i = 0; i < dsiResponse.size(); i++) {
 			assertTrue(dsiResponse.get(i).getObservation().isEmpty());
 		}
-		
-		Property dummyProperty = new Property("temp","temp");
+
+		Property dummyProperty = new Property("temp", "temp");
 		UnitOfMeasurement uom = new UnitOfMeasurement("C", "Celsius", "");
 		ObservationValue dummyObservation = new ObservationValue("23", dummyProperty, uom);
 		PoIInformation poiInfo = new PoIInformation();
-		poiInfo.interpolatedValues = new HashMap<String,ObservationValue>();
+		poiInfo.interpolatedValues = new HashMap<String, ObservationValue>();
 		poiInfo.interpolatedValues.put("prop", dummyObservation);
-		
+
 		for (Map.Entry<String, Location> entry : qiv.thePoints.entrySet()) {
 			interpolatorResponse.theData.put(entry.getKey(), poiInfo);
 		}
-		
+
 		dsiResponse = poi.formatResponse(qiv, interpolatorResponse);
 		for (int i = 0; i < dsiResponse.size(); i++) {
 			assertFalse(dsiResponse.get(i).getObservation().isEmpty());
+			assertEquals(dsiResponse.get(i).toString(),
+					"DomainSpecificInterfaceResponse [latitude=" + dsiResponse.get(i).getLatitude() + ", longitude="
+							+ dsiResponse.get(i).getLongitude() + ", name=" + dsiResponse.get(i).getName()
+							+ ", observation=" + dsiResponse.get(i).getObservation() + "]");
 		}
 	}
-	
+
 	private String getFile(String fileName) {
 		StringBuilder result = new StringBuilder("");
 
-		//Get file from resources folder
+		// Get file from resources folder
 		ClassLoader classLoader = getClass().getClassLoader();
 		File file = new File(classLoader.getResource(fileName).getFile());
 
@@ -108,6 +112,6 @@ public class PoiLogicTest {
 			e.printStackTrace();
 		}
 		return result.toString();
-	  }
+	}
 
 }
