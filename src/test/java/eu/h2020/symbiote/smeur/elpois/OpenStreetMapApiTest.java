@@ -16,8 +16,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import eu.h2020.symbiote.smeur.elpois.messaging.HttpCommunication;
-
 public class OpenStreetMapApiTest {
 	
 	String overpassURL1 = "http://overpass-api.de/api/xapi";
@@ -28,7 +26,7 @@ public class OpenStreetMapApiTest {
 	@Test
 	public void TestReceivingResponseURL1(){
 		try {
-			String instance1 = HttpCommunication.sendGetHttpRequest(overpassURL1+dummyRequestParameters);
+			String instance1 = PoiLogic.sendGetHttpRequest(overpassURL1+dummyRequestParameters);
 			assertNotNull(instance1);
 		} catch (Exception e) {
 			System.out.println("Exception thrown on URL1 testing!");
@@ -38,7 +36,7 @@ public class OpenStreetMapApiTest {
 	@Test
 	public void TestReceivingResponseURL2(){
 		try {
-			String instance2 = HttpCommunication.sendGetHttpRequest(overpassURL2+dummyRequestParameters);
+			String instance2 = PoiLogic.sendGetHttpRequest(overpassURL2+dummyRequestParameters);
 			assertNotNull(instance2);
 		} catch (Exception e) {
 			System.out.println("Exception thrown on URL2 testing!");
@@ -48,7 +46,7 @@ public class OpenStreetMapApiTest {
 	@Test
 	public void TestReceivingResponseURL3(){
 		try {
-			String instance3 = HttpCommunication.sendGetHttpRequest(overpassURL3+dummyRequestParameters);
+			String instance3 = PoiLogic.sendGetHttpRequest(overpassURL3+dummyRequestParameters);
 			assertNotNull(instance3);
 		} catch (Exception e) {
 			System.out.println("Exception thrown on URL3 testing!");
@@ -60,7 +58,7 @@ public class OpenStreetMapApiTest {
 		String response = null;
 		
 		try {
-			response = HttpCommunication.sendGetHttpRequest(overpassURL1+dummyRequestParameters);
+			response = PoiLogic.sendGetHttpRequest(overpassURL1+dummyRequestParameters);
 		} catch (Exception e) {
 			System.out.println("Response not received while testing parsing of result!");
 			e.printStackTrace();
@@ -87,7 +85,7 @@ public class OpenStreetMapApiTest {
 		String response = null;
 		
 		try {
-			response = HttpCommunication.sendGetHttpRequest(overpassURL3+dummyRequestParameters);
+			response = PoiLogic.sendGetHttpRequest(overpassURL3+dummyRequestParameters);
 		} catch (Exception e) {
 			System.out.println("Response not received while testing parsing of result!");
 			e.printStackTrace();

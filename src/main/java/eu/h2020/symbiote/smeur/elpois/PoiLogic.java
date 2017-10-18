@@ -1,7 +1,10 @@
 package eu.h2020.symbiote.smeur.elpois;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,6 +19,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -30,7 +37,6 @@ import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.WritingToResourceListener;
-import eu.h2020.symbiote.smeur.elpois.messaging.HttpCommunication;
 import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
@@ -120,7 +126,7 @@ public class PoiLogic implements ProcessingLogic {
 		return cloudResource;
 	}
 
-	private void registerRapConsumers() {
+	protected void registerRapConsumers() {
 		rapPlugin.registerWritingToResourceListener(new WritingToResourceListener() {
 
 			String overpassURL = "www.overpass-api.de/api/xapi?node";
@@ -156,8 +162,7 @@ public class PoiLogic implements ProcessingLogic {
 
 				try {
 					// contact OSM-api to fetch queried PoIs
-					String osmResponse = HttpCommunication
-							.sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox=" + westBound
+					String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox=" + westBound
 									+ "," + southBound + "," + eastBound + "," + northBound + "]");
 					log.info("Response from overpass-api received: " + osmResponse);
 
@@ -245,5 +250,27 @@ public class PoiLogic implements ProcessingLogic {
 	public void notEnoughResources(NotEnoughResourcesAvailable arg0) {
 		// TODO Auto-generated method stub
 	}
+	
+	public static String sendGetHttpRequest(String address) throws Exception{
+    	SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        
+        URI uri = new URI(address);
+        HttpMethod method = HttpMethod.GET;
+        ClientHttpRequest request = factory.createRequest(uri, method);
+        ClientHttpResponse response = request.execute();
+        
+        BufferedReader rdr = new BufferedReader(new InputStreamReader(response.getBody()));
+        
+        StringBuilder builder = new StringBuilder();
+        String responseString = "";
+
+        while ((responseString = rdr.readLine()) != null) {
+            builder.append(responseString);
+        }
+
+        String result = builder.toString();
+        return result;
+    }
 
 }
