@@ -1,7 +1,9 @@
 package eu.h2020.symbiote.smeur.elpois;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,14 +12,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.annotation.Resource;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import eu.h2020.symbiote.cloud.model.data.observation.Location;
 import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
 import eu.h2020.symbiote.cloud.model.data.observation.Property;
 import eu.h2020.symbiote.cloud.model.data.observation.UnitOfMeasurement;
+import eu.h2020.symbiote.cloud.model.internal.CloudResource;
+import eu.h2020.symbiote.core.model.resources.Service;
 import eu.h2020.symbiote.enablerlogic.EnablerLogic;
+import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.PoIInformation;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
@@ -25,14 +36,34 @@ import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
 
 public class PoiLogicTest {
 
-	PoiLogic poi;
+	@Mock
+	EnablerLogicProperties props;
 
 	EnablerLogic elMock;
 
+	@InjectMocks
+	@Resource
+	private PoiLogic poi;
+
+	@MockBean
+	EnablerLogicProperties props1;
+
 	@Before
 	public void setUp() throws Exception {
-		poi = new PoiLogic();
 		elMock = mock(EnablerLogic.class);
+		props = mock(EnablerLogicProperties.class);
+
+		MockitoAnnotations.initMocks(this);
+		when(props.getEnablerName()).thenReturn("Foo");
+	}
+
+	@Test
+	public void testRegisterResources() {
+
+		CloudResource cr = poi.createServiceResource("23");
+		assertEquals("23", cr.getInternalId());
+		assertEquals("Foo", cr.getPluginId());
+		assertThat(cr.getResource(), instanceOf(Service.class));
 	}
 
 	@Test

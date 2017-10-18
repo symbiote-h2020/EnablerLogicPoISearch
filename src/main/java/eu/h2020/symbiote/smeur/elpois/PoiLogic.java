@@ -21,7 +21,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -89,7 +88,7 @@ public class PoiLogic implements ProcessingLogic {
 	}
 
 	// set IPs
-	private CloudResource createServiceResource(String internalId) {
+	protected CloudResource createServiceResource(String internalId) {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
 		cloudResource.setPluginId(props.getEnablerName());
