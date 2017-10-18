@@ -87,7 +87,7 @@ public class OpenStreetMapApiTest {
 		String response = null;
 		
 		try {
-			response = HttpCommunication.sendGetHttpRequest(overpassURL2+dummyRequestParameters);
+			response = HttpCommunication.sendGetHttpRequest(overpassURL3+dummyRequestParameters);
 		} catch (Exception e) {
 			System.out.println("Response not received while testing parsing of result!");
 			e.printStackTrace();
