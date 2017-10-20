@@ -124,7 +124,7 @@ public class PoiLogicTest {
 		}
 	}
 
-	private String getFile(String fileName) {
+	protected String getFile(String fileName) {
 		StringBuilder result = new StringBuilder("");
 
 		// Get file from resources folder

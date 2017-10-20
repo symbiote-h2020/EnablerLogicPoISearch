@@ -93,8 +93,8 @@ public class PoiLogic implements ProcessingLogic {
 		List<CloudResource> cloudResources = new LinkedList<>();
 		cloudResources.add(createServiceResource("23"));
 
-		// Check if working ?
 		log.info("starting the registration of resources...");
+		//TODO
 		// rhClientService.registerResources(cloudResources);
 	}
 
@@ -131,6 +131,10 @@ public class PoiLogic implements ProcessingLogic {
 		return cloudResource;
 	}
 
+	/**
+	 * Registration of poiConsumer to EnablerLogic,
+	 * Logic of PoISearch.
+	 */
 	protected void registerRapConsumers() {
 		rapPlugin.registerWritingToResourceListener(new WritingToResourceListener() {
 
@@ -189,6 +193,12 @@ public class PoiLogic implements ProcessingLogic {
 		});
 	}
 
+	/**
+	 * Parsing of XML received from osm-API
+	 * @param inputXml
+	 * @param amenity
+	 * @return map of locations where key is locations unique Id.
+	 */
 	public Map<String, Location> parseOsmXml(String inputXml, String amenity) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
@@ -200,13 +210,16 @@ public class PoiLogic implements ProcessingLogic {
 			for (int i = 0; i < nl.getLength(); i++) {
 
 				Location l = new Location();
+				//get latitude and longitude of location
 				l.setLatitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()));
 				l.setLongitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()));
+				//description is a type of queried amenity
 				l.setDescription(amenity);
 
 				NodeList children = nl.item(i).getChildNodes();
 				for (int j = 0; j < children.getLength(); j++) {
 
+					//locations id is a name of found amenity
 					if (children.item(j).getNodeName().equals("tag")
 							&& children.item(j).getAttributes().getNamedItem("k").toString().contains("name")) {
 						l.setId(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
@@ -222,6 +235,12 @@ public class PoiLogic implements ProcessingLogic {
 		}
 	}
 
+	/**
+	 * Formatting received interpolator response to a list of DSI responses.
+	 * @param interpolatorQuery
+	 * @param interpolatorResponse
+	 * @return
+	 */
 	public List<DomainSpecificInterfaceResponse> formatResponse(QueryPoiInterpolatedValues interpolatorQuery,
 			QueryPoiInterpolatedValuesResponse interpolatorResponse) {
 
@@ -251,6 +270,12 @@ public class PoiLogic implements ProcessingLogic {
 		return formatedResponse;
 	}
 
+	/**
+	 * HTTP-GET request to a specified URL
+	 * @param address
+	 * @return
+	 * @throws Exception
+	 */
 	public static String sendGetHttpRequest(String address) throws Exception {
 		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 		factory.setConnectTimeout(5000);

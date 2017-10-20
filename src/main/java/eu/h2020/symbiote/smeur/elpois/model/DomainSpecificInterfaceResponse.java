@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
 
+/**
+ * @author PetarKrivic (1.9.2017)
+ * 
+ * Model of DomainSpecificInterfaceResponse message.
+ */
 public class DomainSpecificInterfaceResponse {
 
 	@JsonProperty
