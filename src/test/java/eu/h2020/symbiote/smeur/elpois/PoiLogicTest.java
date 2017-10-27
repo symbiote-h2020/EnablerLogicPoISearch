@@ -7,9 +7,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 import javax.annotation.Resource;
@@ -20,15 +22,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import eu.h2020.symbiote.cloud.model.data.observation.Location;
-import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
-import eu.h2020.symbiote.cloud.model.data.observation.Property;
-import eu.h2020.symbiote.cloud.model.data.observation.UnitOfMeasurement;
 import eu.h2020.symbiote.cloud.model.internal.CloudResource;
-import eu.h2020.symbiote.core.model.resources.Service;
 import eu.h2020.symbiote.enablerlogic.EnablerLogic;
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
+import eu.h2020.symbiote.model.cim.Location;
+import eu.h2020.symbiote.model.cim.ObservationValue;
+import eu.h2020.symbiote.model.cim.Property;
+import eu.h2020.symbiote.model.cim.Service;
+import eu.h2020.symbiote.model.cim.UnitOfMeasurement;
+import eu.h2020.symbiote.model.cim.WGS84Location;
 import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.PoIInformation;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
@@ -72,17 +75,17 @@ public class PoiLogicTest {
 
 		assertNotNull(getFile("osmResponse.xml"));
 
-		Map<String, Location> map = poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital");
+		Map<String, WGS84Location> map = poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital");
 		assertEquals(3, map.size());
 
-		for (Map.Entry<String, Location> entry : map.entrySet()) {
-			if (entry.getValue().getId().equals("Ambulanta Blatine")) {
+		for (Entry<String, WGS84Location> entry : map.entrySet()) {
+			if (entry.getValue().getName().equals("Ambulanta Blatine")) {
 				assertEquals(43.5063291, entry.getValue().getLatitude(), 0);
 				assertEquals(16.4603236, entry.getValue().getLongitude(), 0);
-			} else if (entry.getValue().getId().equals("Splitske toplice")) {
+			} else if (entry.getValue().getName().equals("Splitske toplice")) {
 				assertEquals(43.5090209, entry.getValue().getLatitude(), 0);
 				assertEquals(16.4370730, entry.getValue().getLongitude(), 0);
-			} else if (entry.getValue().getId().equals("Salus ST")) {
+			} else if (entry.getValue().getName().equals("Salus ST")) {
 				assertEquals(43.5065924, entry.getValue().getLatitude(), 0);
 				assertEquals(16.4738638, entry.getValue().getLongitude(), 0);
 			}
@@ -95,7 +98,7 @@ public class PoiLogicTest {
 				poi.parseOsmXml(getFile("osmResponse.xml"), "Hospital"));
 		QueryPoiInterpolatedValuesResponse interpolatorResponse = new QueryPoiInterpolatedValuesResponse();
 		interpolatorResponse.theData = new HashMap<String, PoIInformation>();
-		for (Map.Entry<String, Location> entry : qiv.thePoints.entrySet()) {
+		for (Entry<String, WGS84Location> entry : qiv.thePoints.entrySet()) {
 			interpolatorResponse.theData.put(entry.getKey(), new PoIInformation());
 		}
 		List<DomainSpecificInterfaceResponse> dsiResponse = poi.formatResponse(qiv, interpolatorResponse);
@@ -103,14 +106,14 @@ public class PoiLogicTest {
 			assertTrue(dsiResponse.get(i).getObservation().isEmpty());
 		}
 
-		Property dummyProperty = new Property("temp", "temp");
-		UnitOfMeasurement uom = new UnitOfMeasurement("C", "Celsius", "");
+		Property dummyProperty = new Property("temp", Arrays.asList("temp"));
+		UnitOfMeasurement uom = new UnitOfMeasurement("C", "Celsius", Arrays.asList(""));
 		ObservationValue dummyObservation = new ObservationValue("23", dummyProperty, uom);
 		PoIInformation poiInfo = new PoIInformation();
 		poiInfo.interpolatedValues = new HashMap<String, ObservationValue>();
 		poiInfo.interpolatedValues.put("prop", dummyObservation);
 
-		for (Map.Entry<String, Location> entry : qiv.thePoints.entrySet()) {
+		for (Entry<String, WGS84Location> entry : qiv.thePoints.entrySet()) {
 			interpolatorResponse.theData.put(entry.getKey(), poiInfo);
 		}
 

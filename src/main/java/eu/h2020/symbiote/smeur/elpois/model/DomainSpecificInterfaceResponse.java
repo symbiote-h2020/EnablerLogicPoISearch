@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
+import eu.h2020.symbiote.model.cim.ObservationValue;
+
 
 /**
  * @author PetarKrivic (1.9.2017)

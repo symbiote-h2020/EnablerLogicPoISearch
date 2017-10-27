@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -37,16 +38,17 @@ import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.WritingToResourceListener;
+import eu.h2020.symbiote.model.cim.Location;
+import eu.h2020.symbiote.model.cim.ObservationValue;
+import eu.h2020.symbiote.model.cim.Parameter;
+import eu.h2020.symbiote.model.cim.Service;
+import eu.h2020.symbiote.model.cim.WGS84Location;
 import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
+import eu.h2020.symbiote.cloud.model.data.InputParameter;
 import eu.h2020.symbiote.cloud.model.data.Result;
-import eu.h2020.symbiote.cloud.model.data.parameter.InputParameter;
 import eu.h2020.symbiote.cloud.model.internal.CloudResource;
-import eu.h2020.symbiote.core.model.resources.Parameter;
-import eu.h2020.symbiote.core.model.resources.Service;
-import eu.h2020.symbiote.cloud.model.data.observation.Location;
-import eu.h2020.symbiote.cloud.model.data.observation.ObservationValue;
 import eu.h2020.symbiote.enabler.messaging.model.EnablerLogicDataAppearedMessage;
 import eu.h2020.symbiote.enabler.messaging.model.NotEnoughResourcesAvailable;
 import eu.h2020.symbiote.enabler.messaging.model.ResourcesUpdated;
@@ -199,22 +201,22 @@ public class PoiLogic implements ProcessingLogic {
 	 * @param amenity
 	 * @return map of locations where key is locations unique Id.
 	 */
-	public Map<String, Location> parseOsmXml(String inputXml, String amenity) {
+	public Map<String, WGS84Location> parseOsmXml(String inputXml, String amenity) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
-			Map<String, Location> interpolatorQueryMap = new HashMap<String, Location>();
+			Map<String, WGS84Location> interpolatorQueryMap = new HashMap<String, WGS84Location>();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document document = builder.parse(new InputSource(new StringReader(inputXml)));
 
 			NodeList nl = document.getElementsByTagName("node");
 			for (int i = 0; i < nl.getLength(); i++) {
 
-				Location l = new Location();
+				WGS84Location l = new WGS84Location(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()), Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()), 0, null, Arrays.asList(amenity));
 				//get latitude and longitude of location
-				l.setLatitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()));
-				l.setLongitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()));
+				//l.setLatitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()));
+				//l.setLongitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()));
 				//description is a type of queried amenity
-				l.setDescription(amenity);
+				//l.setDescription(amenity);
 
 				NodeList children = nl.item(i).getChildNodes();
 				for (int j = 0; j < children.getLength(); j++) {
@@ -222,7 +224,7 @@ public class PoiLogic implements ProcessingLogic {
 					//locations id is a name of found amenity
 					if (children.item(j).getNodeName().equals("tag")
 							&& children.item(j).getAttributes().getNamedItem("k").toString().contains("name")) {
-						l.setId(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
+						l.setName(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
 					}
 				}
 				interpolatorQueryMap.put(UUID.randomUUID().toString(), l);
@@ -246,9 +248,9 @@ public class PoiLogic implements ProcessingLogic {
 
 		List<DomainSpecificInterfaceResponse> formatedResponse = new LinkedList<DomainSpecificInterfaceResponse>();
 
-		for (Map.Entry<String, Location> entry : interpolatorQuery.thePoints.entrySet()) {
+		for (Entry<String, WGS84Location> entry : interpolatorQuery.thePoints.entrySet()) {
 			DomainSpecificInterfaceResponse place = new DomainSpecificInterfaceResponse();
-			place.setName(entry.getValue().getId());
+			place.setName(entry.getValue().getName());
 			place.setLatitude(String.valueOf(entry.getValue().getLatitude()));
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
