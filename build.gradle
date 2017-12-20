@@ -88,6 +88,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-rest')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-devtools')
 
 	//EnablerLogic starter
 	compile('com.github.symbiote-h2020:EnablerLogic:develop-SNAPSHOT') { changing = true }
@@ -124,3 +125,7 @@ dependencyCheck {
 
 // including code quality extensions into the build
 check.dependsOn(jacocoTestReport, 'dependencyCheck')
+
+bootRepackage {
+    excludeDevtools = false
+}

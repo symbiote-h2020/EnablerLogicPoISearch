@@ -20,6 +20,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -38,11 +39,13 @@ import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
 import eu.h2020.symbiote.enablerlogic.rap.plugin.WritingToResourceListener;
-import eu.h2020.symbiote.model.cim.Location;
 import eu.h2020.symbiote.model.cim.ObservationValue;
 import eu.h2020.symbiote.model.cim.Parameter;
 import eu.h2020.symbiote.model.cim.Service;
 import eu.h2020.symbiote.model.cim.WGS84Location;
+import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
+import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier.SingleTokenAccessPolicyType;
+import eu.h2020.symbiote.security.commons.exceptions.custom.InvalidArgumentsException;
 import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
@@ -67,6 +70,9 @@ public class PoiLogic implements ProcessingLogic {
 
 	@Autowired
 	private RegistrationHandlerClientService rhClientService;
+
+	@Value("${symbIoTe.interworking.interface.url}")
+	private String interworkingInterfaceUrl;
 
 	@Override
 	public void initialization(EnablerLogic enablerLogic) {
@@ -96,8 +102,15 @@ public class PoiLogic implements ProcessingLogic {
 		cloudResources.add(createServiceResource("23"));
 
 		log.info("starting the registration of resources...");
-		//TODO
-		// rhClientService.registerResources(cloudResources);
+
+		try {
+
+			log.info("REGISTER RESOURCES:" + rhClientService.registerResources(cloudResources).toString());
+
+		} catch (Throwable t) {
+			log.error("ERROR in registering resources.", t);
+		}
+		log.info("Hello!");
 	}
 
 	// set IPs
@@ -109,8 +122,9 @@ public class PoiLogic implements ProcessingLogic {
 
 		Service service = new Service();
 		cloudResource.setResource(service);
-		service.setInterworkingServiceURL("https://symbiote-h2020.eu/example/interworkingService/");
+		service.setInterworkingServiceURL(interworkingInterfaceUrl + "/");
 
+		service.setDescription(new LinkedList<>());
 		service.setName("PointOfInterestSearch");
 
 		Parameter parameter1 = new Parameter();
@@ -129,13 +143,20 @@ public class PoiLogic implements ProcessingLogic {
 		parameter4.setMandatory(true);
 		parameter4.setName("amenity");
 
+		try {
+			cloudResource.setSingleTokenAccessPolicy(
+					new SingleTokenAccessPolicySpecifier(SingleTokenAccessPolicyType.PUBLIC, new HashMap<>()));
+		} catch (InvalidArgumentsException e) {
+			log.error("Security Token Access Policy Error", e);
+		}
+
 		service.setParameters(Arrays.asList(parameter1, parameter2, parameter3, parameter4));
+		log.info("Service parameters set.");
 		return cloudResource;
 	}
 
 	/**
-	 * Registration of poiConsumer to EnablerLogic,
-	 * Logic of PoISearch.
+	 * Registration of poiConsumer to EnablerLogic, Logic of PoISearch.
 	 */
 	protected void registerRapConsumers() {
 		rapPlugin.registerWritingToResourceListener(new WritingToResourceListener() {
@@ -190,6 +211,9 @@ public class PoiLogic implements ProcessingLogic {
 					log.info("HTTP communication with OSM overpass-api failed!");
 					e.printStackTrace();
 					return null;
+					// return new Result<>(false, null,
+					// om.writeValueAsString(formatResponse(qiv, response)));
+
 				}
 			}
 		});
@@ -197,6 +221,7 @@ public class PoiLogic implements ProcessingLogic {
 
 	/**
 	 * Parsing of XML received from osm-API
+	 * 
 	 * @param inputXml
 	 * @param amenity
 	 * @return map of locations where key is locations unique Id.
@@ -211,17 +236,15 @@ public class PoiLogic implements ProcessingLogic {
 			NodeList nl = document.getElementsByTagName("node");
 			for (int i = 0; i < nl.getLength(); i++) {
 
-				WGS84Location l = new WGS84Location(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()), Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()), 0, null, Arrays.asList(amenity));
-				//get latitude and longitude of location
-				//l.setLatitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()));
-				//l.setLongitude(Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()));
-				//description is a type of queried amenity
-				//l.setDescription(amenity);
+				WGS84Location l = new WGS84Location(
+						Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue()),
+						Double.parseDouble(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue()), 0, null,
+						Arrays.asList(amenity));
 
 				NodeList children = nl.item(i).getChildNodes();
 				for (int j = 0; j < children.getLength(); j++) {
 
-					//locations id is a name of found amenity
+					// locations id is a name of found amenity
 					if (children.item(j).getNodeName().equals("tag")
 							&& children.item(j).getAttributes().getNamedItem("k").toString().contains("name")) {
 						l.setName(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
@@ -239,6 +262,7 @@ public class PoiLogic implements ProcessingLogic {
 
 	/**
 	 * Formatting received interpolator response to a list of DSI responses.
+	 * 
 	 * @param interpolatorQuery
 	 * @param interpolatorResponse
 	 * @return
@@ -274,6 +298,7 @@ public class PoiLogic implements ProcessingLogic {
 
 	/**
 	 * HTTP-GET request to a specified URL
+	 * 
 	 * @param address
 	 * @return
 	 * @throws Exception
