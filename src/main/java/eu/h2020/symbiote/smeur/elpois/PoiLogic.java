@@ -142,7 +142,9 @@ public class PoiLogic implements ProcessingLogic {
 		Parameter parameter4 = new Parameter();
 		parameter4.setMandatory(true);
 		parameter4.setName("amenity");
-
+		
+		service.setDescription(Arrays.asList("poi service"));
+		log.info("added service description and parameters..");
 		try {
 			cloudResource.setSingleTokenAccessPolicy(
 					new SingleTokenAccessPolicySpecifier(SingleTokenAccessPolicyType.PUBLIC, new HashMap<>()));
