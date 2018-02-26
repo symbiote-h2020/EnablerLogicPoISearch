@@ -170,7 +170,7 @@ public class PoiLogic implements ProcessingLogic {
 
 			@Override
 			public Result<Object> writeResource(String resourceId, List<InputParameter> parameters) {
-				log.info("writing to resource {} body:{}", resourceId, parameters);
+				log.info("RAP consumer received message with resourceId {} and parameters in body:{}", resourceId, parameters);
 
 				for (InputParameter ip : parameters) {
 					// parse inputParameters
@@ -184,18 +184,19 @@ public class PoiLogic implements ProcessingLogic {
 						amenity = ip.getValue();
 				}
 
-				log.info("received parameters are: latitude=" + String.valueOf(lat) + ", longitude="
+				log.info("Received parameters are: latitude=" + String.valueOf(lat) + ", longitude="
 						+ String.valueOf(lon) + ", radius=" + String.valueOf(r) + ", amenity=" + amenity);
 				// calculate bounds of bounding box
 				double northBound = lat + ((1 / 111.0) * r);
 				double southBound = lat - ((1 / 111.0) * r);
 				double eastBound = lon + ((1 / (111.0 * (Math.cos(Math.toRadians(lat))))) * r);
 				double westBound = lon - ((1 / (111.0 * Math.cos(Math.toRadians(lat)))) * r);
-				log.info("boundingbox: N=" + String.valueOf(northBound) + ";S=" + String.valueOf(southBound) + ";E="
+				log.info("Calculated boundingbox: N=" + String.valueOf(northBound) + ";S=" + String.valueOf(southBound) + ";E="
 						+ String.valueOf(eastBound) + ";W=" + String.valueOf(westBound));
 
 				try {
 					// contact OSM-api to fetch queried PoIs
+					log.info("Sending HTTP request to OSM...");
 					String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox="
 							+ westBound + "," + southBound + "," + eastBound + "," + northBound + "]");
 					log.info("Response from overpass-api received: " + osmResponse);
@@ -207,15 +208,13 @@ public class PoiLogic implements ProcessingLogic {
 							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
 					log.info("RPC communication with Interpolator successful! Received response: "
 							+ response.toString());
+					log.info("Sending response message : " + om.writeValueAsString(formatResponse(qiv, response)));
 					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
 
 				} catch (Exception e) {
 					log.info("HTTP communication with OSM overpass-api failed!");
 					e.printStackTrace();
 					return null;
-					// return new Result<>(false, null,
-					// om.writeValueAsString(formatResponse(qiv, response)));
-
 				}
 			}
 		});
@@ -281,15 +280,13 @@ public class PoiLogic implements ProcessingLogic {
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
 			List<ObservationValue> observations = new LinkedList<ObservationValue>();
 
-			log.info("error reason: " + interpolatorResponse.theData.get(entry.getKey()).errorReason);
-			log.info("poiID: " + interpolatorResponse.theData.get(entry.getKey()).poiID);
 			try {
 				for (Map.Entry<String, ObservationValue> e : interpolatorResponse.theData
 						.get(entry.getKey()).interpolatedValues.entrySet()) {
 					observations.add(e.getValue());
 				}
 			} catch (NullPointerException e) {
-				log.info("Error occurred! Interpolator doesnt have any data for requested POIs.");
+				log.info("Error occurred! Interpolator doesn't have any data for requested POIs.");
 			}
 
 			place.setObservation(observations);
