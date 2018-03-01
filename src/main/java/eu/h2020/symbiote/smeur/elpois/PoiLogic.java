@@ -305,7 +305,7 @@ public class PoiLogic implements ProcessingLogic {
 	public static String sendGetHttpRequest(String address) throws Exception {
 		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 		factory.setConnectTimeout(5000);
-
+		factory.setReadTimeout(10000);
 		URI uri = new URI(address);
 		HttpMethod method = HttpMethod.GET;
 		ClientHttpRequest request = factory.createRequest(uri, method);
