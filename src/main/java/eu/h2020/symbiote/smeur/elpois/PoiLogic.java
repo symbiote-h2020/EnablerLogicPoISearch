@@ -43,10 +43,10 @@ import eu.h2020.symbiote.model.cim.ObservationValue;
 import eu.h2020.symbiote.model.cim.Parameter;
 import eu.h2020.symbiote.model.cim.Service;
 import eu.h2020.symbiote.model.cim.WGS84Location;
+import eu.h2020.symbiote.security.accesspolicies.common.AccessPolicyType;
 import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
-import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier.SingleTokenAccessPolicyType;
 import eu.h2020.symbiote.security.commons.exceptions.custom.InvalidArgumentsException;
-import eu.h2020.symbiote.smeur.elpois.model.DomainSpecificInterfaceResponse;
+import eu.h2020.symbiote.smeur.messages.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
 import eu.h2020.symbiote.cloud.model.data.InputParameter;
@@ -146,8 +146,8 @@ public class PoiLogic implements ProcessingLogic {
 		service.setDescription(Arrays.asList("poi service"));
 		log.info("added service description and parameters..");
 		try {
-			cloudResource.setSingleTokenAccessPolicy(
-					new SingleTokenAccessPolicySpecifier(SingleTokenAccessPolicyType.PUBLIC, new HashMap<>()));
+			cloudResource.setAccessPolicy(
+					new SingleTokenAccessPolicySpecifier(AccessPolicyType.PUBLIC, new HashMap<>()));
 		} catch (InvalidArgumentsException e) {
 			log.error("Security Token Access Policy Error", e);
 		}
@@ -208,7 +208,7 @@ public class PoiLogic implements ProcessingLogic {
 							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
 					log.info("RPC communication with Interpolator successful! Received response: "
 							+ response.toString());
-					log.info("Sending response message : " + om.writeValueAsString(formatResponse(qiv, response)));
+					//log.info("Sending response message : " + om.writeValueAsString(formatResponse(qiv, response)));
 					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
 
 				} catch (Exception e) {
