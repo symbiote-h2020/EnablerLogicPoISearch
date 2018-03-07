@@ -105,8 +105,8 @@ public class PoiLogicTest {
 			assertTrue(dsiResponse.get(i).getObservation().isEmpty());
 		}
 
-		Property dummyProperty = new Property("temp", Arrays.asList("temp"));
-		UnitOfMeasurement uom = new UnitOfMeasurement("C", "Celsius", Arrays.asList(""));
+		Property dummyProperty = new Property("temp", "http://purl.oclc.org/NET/ssnx/qu/quantity#temperature",Arrays.asList("temp"));
+		UnitOfMeasurement uom = new UnitOfMeasurement("C", "Celsius", "http://purl.oclc.org/NET/ssnx/qu/unit#degreeCelsius", Arrays.asList(""));
 		ObservationValue dummyObservation = new ObservationValue("23", dummyProperty, uom);
 		PoIInformation poiInfo = new PoIInformation();
 		poiInfo.interpolatedValues = new HashMap<String, ObservationValue>();
