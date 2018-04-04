@@ -37,12 +37,12 @@ import eu.h2020.symbiote.enablerlogic.EnablerLogic;
 import eu.h2020.symbiote.enablerlogic.ProcessingLogic;
 import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService;
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
-import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
-import eu.h2020.symbiote.enablerlogic.rap.plugin.WritingToResourceListener;
 import eu.h2020.symbiote.model.cim.ObservationValue;
-import eu.h2020.symbiote.model.cim.Parameter;
 import eu.h2020.symbiote.model.cim.Service;
 import eu.h2020.symbiote.model.cim.WGS84Location;
+import eu.h2020.symbiote.rapplugin.domain.Parameter;
+import eu.h2020.symbiote.rapplugin.messaging.rap.InvokingServiceListener;
+import eu.h2020.symbiote.rapplugin.messaging.rap.RapPlugin;
 import eu.h2020.symbiote.security.accesspolicies.common.AccessPolicyType;
 import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
 import eu.h2020.symbiote.security.commons.exceptions.custom.InvalidArgumentsException;
@@ -161,7 +161,7 @@ public class PoiLogic implements ProcessingLogic {
 	 * Registration of poiConsumer to EnablerLogic, Logic of PoISearch.
 	 */
 	protected void registerRapConsumers() {
-		rapPlugin.registerWritingToResourceListener(new WritingToResourceListener() {
+		rapPlugin.registerInvokingServiceListener(new InvokingServiceListener() {
 
 			String overpassURL = "www.overpass-api.de/api/xapi?node";
 			double lat, lon, r;
@@ -169,7 +169,7 @@ public class PoiLogic implements ProcessingLogic {
 			ObjectMapper om = new ObjectMapper();
 
 			@Override
-			public Result<Object> writeResource(String resourceId, List<InputParameter> parameters) {
+			public Object invokeService(String resourceId, Map<String, Parameter> parameters) {
 				log.info("RAP consumer received message with resourceId {} and parameters in body:{}", resourceId, parameters);
 
 				for (InputParameter ip : parameters) {

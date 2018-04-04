@@ -79,6 +79,9 @@ dependencies {
 
 	//SMEUR libraries
 	compile('com.github.symbiote-h2020:SMEURLibraries:develop-SNAPSHOT')
+	
+	//Rap plugin
+	compile('com.github.symbiote-h2020:ResourceAccessProxyPlugin:0.3.1')
 
     // Spring
     compile('org.springframework.cloud:spring-cloud-starter-config')
