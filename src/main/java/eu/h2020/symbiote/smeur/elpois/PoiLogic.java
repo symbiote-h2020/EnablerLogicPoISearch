@@ -38,9 +38,10 @@ import eu.h2020.symbiote.enablerlogic.ProcessingLogic;
 import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService;
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.model.cim.ObservationValue;
+import eu.h2020.symbiote.model.cim.Parameter;
 import eu.h2020.symbiote.model.cim.Service;
 import eu.h2020.symbiote.model.cim.WGS84Location;
-import eu.h2020.symbiote.rapplugin.domain.Parameter;
+//import eu.h2020.symbiote.rapplugin.domain.Parameter;
 import eu.h2020.symbiote.rapplugin.messaging.rap.InvokingServiceListener;
 import eu.h2020.symbiote.rapplugin.messaging.rap.RapPlugin;
 import eu.h2020.symbiote.security.accesspolicies.common.AccessPolicyType;
@@ -49,7 +50,6 @@ import eu.h2020.symbiote.security.commons.exceptions.custom.InvalidArgumentsExce
 import eu.h2020.symbiote.smeur.messages.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValuesResponse;
-import eu.h2020.symbiote.cloud.model.data.InputParameter;
 import eu.h2020.symbiote.cloud.model.data.Result;
 import eu.h2020.symbiote.cloud.model.internal.CloudResource;
 import eu.h2020.symbiote.enabler.messaging.model.EnablerLogicDataAppearedMessage;
@@ -169,19 +169,30 @@ public class PoiLogic implements ProcessingLogic {
 			ObjectMapper om = new ObjectMapper();
 
 			@Override
-			public Object invokeService(String resourceId, Map<String, Parameter> parameters) {
+			public Object invokeService(String resourceId, Map<String, eu.h2020.symbiote.rapplugin.domain.Parameter> parameters) {
 				log.info("RAP consumer received message with resourceId {} and parameters in body:{}", resourceId, parameters);
 
-				for (InputParameter ip : parameters) {
-					// parse inputParameters
+//				for (InputParameter ip : parameters) {
+//					// parse inputParameters
+//					if (ip.getName().equals("latitude"))
+//						lat = Double.parseDouble(ip.getValue());
+//					else if (ip.getName().equals("longitude"))
+//						lon = Double.parseDouble(ip.getValue());
+//					else if (ip.getName().equals("radius"))
+//						r = Double.parseDouble(ip.getValue());
+//					else if (ip.getName().equals("amenity"))
+//						amenity = ip.getValue();
+//				}
+				
+				for(eu.h2020.symbiote.rapplugin.domain.Parameter ip : parameters.values()){
 					if (ip.getName().equals("latitude"))
-						lat = Double.parseDouble(ip.getValue());
+						lat = Double.parseDouble((String) ip.getValue());
 					else if (ip.getName().equals("longitude"))
-						lon = Double.parseDouble(ip.getValue());
+						lon = Double.parseDouble((String) ip.getValue());
 					else if (ip.getName().equals("radius"))
-						r = Double.parseDouble(ip.getValue());
+						r = Double.parseDouble((String) ip.getValue());
 					else if (ip.getName().equals("amenity"))
-						amenity = ip.getValue();
+						amenity = (String) ip.getValue();
 				}
 
 				log.info("Received parameters are: latitude=" + String.valueOf(lat) + ", longitude="
