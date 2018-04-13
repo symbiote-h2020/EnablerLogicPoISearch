@@ -25,12 +25,13 @@ import org.mockito.MockitoAnnotations;
 import eu.h2020.symbiote.cloud.model.internal.CloudResource;
 import eu.h2020.symbiote.enablerlogic.EnablerLogic;
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
-import eu.h2020.symbiote.enablerlogic.rap.plugin.RapPlugin;
+
 import eu.h2020.symbiote.model.cim.ObservationValue;
 import eu.h2020.symbiote.model.cim.Property;
 import eu.h2020.symbiote.model.cim.Service;
 import eu.h2020.symbiote.model.cim.UnitOfMeasurement;
 import eu.h2020.symbiote.model.cim.WGS84Location;
+import eu.h2020.symbiote.rapplugin.messaging.rap.RapPlugin;
 import eu.h2020.symbiote.smeur.messages.DomainSpecificInterfaceResponse;
 import eu.h2020.symbiote.smeur.messages.PoIInformation;
 import eu.h2020.symbiote.smeur.messages.QueryPoiInterpolatedValues;

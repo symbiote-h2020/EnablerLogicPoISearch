@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.9.RELEASE'
+        springBootVersion = '1.5.11.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -96,6 +96,7 @@ dependencies {
 
 	//EnablerLogic starter
 	compile('com.github.symbiote-h2020:EnablerLogic:develop-SNAPSHOT') { changing = true }
+	//compile('com.github.symbiote-h2020:EnablerLogic:0.3.2')
 	
     // test only
     testCompile('org.springframework.boot:spring-boot-starter-test')
