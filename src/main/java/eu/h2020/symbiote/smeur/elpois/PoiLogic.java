@@ -103,13 +103,12 @@ public class PoiLogic implements ProcessingLogic {
 		log.info("starting the registration of resources...");
 
 		try {
-
 			log.info("REGISTER RESOURCES:" + rhClientService.registerResources(cloudResources).toString());
-
 		} catch (Throwable t) {
 			log.error("ERROR in registering resources.", t);
 		}
-		log.info("Hello!");
+		
+		log.info("Point of Interest service ready!");
 	}
 
 	// set IPs
@@ -173,11 +172,11 @@ public class PoiLogic implements ProcessingLogic {
 				
 				for(eu.h2020.symbiote.rapplugin.domain.Parameter ip : parameters.values()){
 					if (ip.getName().equals("latitude"))
-						lat = Double.parseDouble((String) ip.getValue());
+						lat = (double) ip.getValue();
 					else if (ip.getName().equals("longitude"))
-						lon = Double.parseDouble((String) ip.getValue());
+						lon = (double) ip.getValue();
 					else if (ip.getName().equals("radius"))
-						r = Double.parseDouble((String) ip.getValue());
+						r = (double) ip.getValue();
 					else if (ip.getName().equals("amenity"))
 						amenity = (String) ip.getValue();
 				}
