@@ -248,7 +248,7 @@ public class PoiLogic implements ProcessingLogic {
 						l.setName(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
 					}
 				}
-				interpolatorQueryMap.put(UUID.randomUUID().toString(), l);
+				interpolatorQueryMap.put(nl.item(i).getAttributes().getNamedItem("id").getNodeValue(), l);
 			}
 			return interpolatorQueryMap;
 		} catch (SAXException | IOException | ParserConfigurationException e) {
@@ -272,6 +272,7 @@ public class PoiLogic implements ProcessingLogic {
 
 		for (Entry<String, WGS84Location> entry : interpolatorQuery.thePoints.entrySet()) {
 			DomainSpecificInterfaceResponse place = new DomainSpecificInterfaceResponse();
+			place.setId(entry.getKey());
 			place.setName(entry.getValue().getName());
 			place.setLatitude(String.valueOf(entry.getValue().getLatitude()));
 			place.setLongitude(String.valueOf(entry.getValue().getLongitude()));
