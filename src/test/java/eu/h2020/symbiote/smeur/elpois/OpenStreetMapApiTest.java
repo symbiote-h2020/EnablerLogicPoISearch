@@ -85,23 +85,23 @@ public class OpenStreetMapApiTest {
 
 		try {
 			response = PoiLogic.sendGetHttpRequest(overpassURL1 + dummyRequestParameters);
+			
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder;
+			try {
+				builder = factory.newDocumentBuilder();
+				Document document = builder.parse(new InputSource(new StringReader(response)));
+				NodeList nl = document.getElementsByTagName("node");
+
+				for (int i = 0; i < nl.getLength(); i++) {
+					assertNotNull(nl.item(i).getAttributes().getNamedItem("lat"));
+					assertNotNull(nl.item(i).getAttributes().getNamedItem("lon"));
+				}
+			} catch (ParserConfigurationException | SAXException | IOException e) {
+				e.printStackTrace();
+			}
 		} catch (Exception e) {
 			System.out.println("Response not received while testing parsing of result!");
-			e.printStackTrace();
-		}
-
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
-		try {
-			builder = factory.newDocumentBuilder();
-			Document document = builder.parse(new InputSource(new StringReader(response)));
-			NodeList nl = document.getElementsByTagName("node");
-
-			for (int i = 0; i < nl.getLength(); i++) {
-				assertNotNull(nl.item(i).getAttributes().getNamedItem("lat"));
-				assertNotNull(nl.item(i).getAttributes().getNamedItem("lon"));
-			}
-		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		}
 	}
