@@ -243,7 +243,9 @@ public class PoiLogic implements ProcessingLogic {
 	 */
 	public List<DomainSpecificInterfaceResponse> parseInitXml(String inputXml) {
 		
-		boolean flag = false;
+		boolean flag1 = false;
+		boolean flag2 = false;
+		int counter = 0; // limit to 500 results
 		List<DomainSpecificInterfaceResponse> returningList = new LinkedList<DomainSpecificInterfaceResponse>();
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -252,7 +254,7 @@ public class PoiLogic implements ProcessingLogic {
 				Document document = builder.parse(new InputSource(new StringReader(inputXml)));
 
 				NodeList nl = document.getElementsByTagName("node");
-				for (int i = 0; i < nl.getLength(); i++) {	
+				for (int i = 0; i < nl.getLength(); i++) {
 					DomainSpecificInterfaceResponse dsiResponse = new DomainSpecificInterfaceResponse();
 					NodeList children = nl.item(i).getChildNodes();
 					
@@ -262,21 +264,24 @@ public class PoiLogic implements ProcessingLogic {
 						if (children.item(j).getNodeName().equals("tag")
 								&& children.item(j).getAttributes().getNamedItem("k").toString().contains("name")) {
 							dsiResponse.setName(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
-							flag = true;
+							flag1 = true;
 						}
 						if(children.item(j).getNodeName().equals("tag")
 								&& children.item(j).getAttributes().getNamedItem("k").toString().contains("amenity")){
 							dsiResponse.setAmenity(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
-							flag = true;
+							flag2 = true;
 						}
 					}
-					if(flag){
+					if(flag1 && flag2){
 						dsiResponse.setLongitude(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue());
 						dsiResponse.setLatitude(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue());
 						dsiResponse.setId(nl.item(i).getAttributes().getNamedItem("id").getNodeValue());
 						returningList.add(dsiResponse);
-						flag = false;
+						flag1 = false;
+						flag2=false;
+						counter++;
 					}
+					if(counter==500)break;
 				}
 				return returningList;
 			} catch (SAXException | IOException | ParserConfigurationException e) {
