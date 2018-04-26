@@ -190,33 +190,101 @@ public class PoiLogic implements ProcessingLogic {
 				double westBound = lon - ((1 / (111.0 * Math.cos(Math.toRadians(lat)))) * r);
 				log.info("Calculated boundingbox: N=" + String.valueOf(northBound) + ";S=" + String.valueOf(southBound) + ";E="
 						+ String.valueOf(eastBound) + ";W=" + String.valueOf(westBound));
-
-				try {
-					// contact OSM-api to fetch queried PoIs
+				
+				//if initial request for fetching all pois received..
+				if(amenity.equals("all")){
 					log.info("Sending HTTP request to OSM...");
-					String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox="
-							+ westBound + "," + southBound + "," + eastBound + "," + northBound + "]");
-					log.info("Response from overpass-api received: " + osmResponse);
-
-					QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
-
-					// contact interpolator to fetch interpolated data
-					QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
-							"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
-					log.info("RPC communication with Interpolator successful! Received response: "
-							+ response.toString());
-					//log.info("Sending response message : " + om.writeValueAsString(formatResponse(qiv, response)));
-					return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
-
-				} catch (Exception e) {
-					log.info("HTTP communication with OSM overpass-api failed!");
-					e.printStackTrace();
-					return null;
+					try {
+						String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[bbox="
+								+ westBound + "," + southBound + "," + eastBound + "," + northBound + "]");
+						log.info("Response from overpass-api received!");
+						
+						return new Result<>(false, null, om.writeValueAsString(parseInitXml(osmResponse)));
+					} catch (Exception e) {
+						log.info("HTTP communication with OSM overpass-api failed!");
+						e.printStackTrace();
+						return null;
+					}
+				}
+				else{
+					try {
+						// contact OSM-api to fetch queried PoIs
+						log.info("Sending HTTP request to OSM...");
+						String osmResponse = sendGetHttpRequest("http://" + overpassURL + "[amenity=" + amenity + "][bbox="
+								+ westBound + "," + southBound + "," + eastBound + "," + northBound + "]");
+						log.info("Response from overpass-api received: " + osmResponse);
+	
+						QueryPoiInterpolatedValues qiv = new QueryPoiInterpolatedValues(parseOsmXml(osmResponse, amenity));
+	
+						// contact interpolator to fetch interpolated data
+						QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
+								"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class);
+						log.info("RPC communication with Interpolator successful! Received response: "
+								+ response.toString());
+						//log.info("Sending response message : " + om.writeValueAsString(formatResponse(qiv, response)));
+						return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
+	
+					} catch (Exception e) {
+						log.info("HTTP communication with OSM overpass-api failed!");
+						e.printStackTrace();
+						return null;
+					}
 				}
 			}
 		});
 	}
 
+	/**
+	 * Parsing of XML received from osm-API (initial request)
+	 * 
+	 * @param inputXml
+	 * @param amenity
+	 * @return map of locations where key is locations unique Id.
+	 */
+	public List<DomainSpecificInterfaceResponse> parseInitXml(String inputXml) {
+		
+		boolean flag = false;
+		List<DomainSpecificInterfaceResponse> returningList = new LinkedList<DomainSpecificInterfaceResponse>();
+		
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			try {
+				DocumentBuilder builder = factory.newDocumentBuilder();
+				Document document = builder.parse(new InputSource(new StringReader(inputXml)));
+
+				NodeList nl = document.getElementsByTagName("node");
+				for (int i = 0; i < nl.getLength(); i++) {	
+					DomainSpecificInterfaceResponse dsiResponse = new DomainSpecificInterfaceResponse();
+					NodeList children = nl.item(i).getChildNodes();
+					
+					for (int j = 0; j < children.getLength(); j++) {
+						
+						// locations id is a name of found amenity
+						if (children.item(j).getNodeName().equals("tag")
+								&& children.item(j).getAttributes().getNamedItem("k").toString().contains("name")) {
+							dsiResponse.setName(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
+							flag = true;
+						}
+						if(children.item(j).getNodeName().equals("tag")
+								&& children.item(j).getAttributes().getNamedItem("k").toString().contains("amenity")){
+							dsiResponse.setAmenity(children.item(j).getAttributes().getNamedItem("v").getNodeValue());
+							flag = true;
+						}
+					}
+					if(flag){
+						dsiResponse.setLongitude(nl.item(i).getAttributes().getNamedItem("lon").getNodeValue());
+						dsiResponse.setLatitude(nl.item(i).getAttributes().getNamedItem("lat").getNodeValue());
+						dsiResponse.setId(nl.item(i).getAttributes().getNamedItem("id").getNodeValue());
+						returningList.add(dsiResponse);
+						flag = false;
+					}
+				}
+				return returningList;
+			} catch (SAXException | IOException | ParserConfigurationException e) {
+				log.info("ERROR parsing XML!");
+				return null;
+			}
+	}
+	
 	/**
 	 * Parsing of XML received from osm-API
 	 * 
