@@ -143,6 +143,7 @@ public class PoiLogic implements ProcessingLogic {
 		service.setDescription(Arrays.asList("poi service"));
 		log.info("added service description and parameters..");
 		try {
+			cloudResource.setFilteringPolicy(new SingleTokenAccessPolicySpecifier(AccessPolicyType.PUBLIC, new HashMap<>()));
 			cloudResource.setAccessPolicy(
 					new SingleTokenAccessPolicySpecifier(AccessPolicyType.PUBLIC, new HashMap<>()));
 		} catch (InvalidArgumentsException e) {
