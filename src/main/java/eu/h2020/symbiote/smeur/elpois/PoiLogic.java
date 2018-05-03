@@ -218,9 +218,6 @@ public class PoiLogic implements ProcessingLogic {
 						// contact interpolator to fetch interpolated data
 						QueryPoiInterpolatedValuesResponse response = enablerLogic.sendSyncMessageToEnablerLogic(
 								"EnablerLogicInterpolator", qiv, QueryPoiInterpolatedValuesResponse.class, 40000);
-						log.info("RPC communication with Interpolator successful! Received response: "
-								+ response.toString());
-						//log.info("Sending response message : " + om.writeValueAsString(formatResponse(qiv, response)));
 						return new Result<>(false, null, om.writeValueAsString(formatResponse(qiv, response)));
 	
 					} catch (Exception e) {
