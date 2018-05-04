@@ -36,8 +36,10 @@ import eu.h2020.symbiote.enablerlogic.EnablerLogic;
 import eu.h2020.symbiote.enablerlogic.ProcessingLogic;
 import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService;
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
+import eu.h2020.symbiote.model.cim.Datatype;
 import eu.h2020.symbiote.model.cim.ObservationValue;
 import eu.h2020.symbiote.model.cim.Parameter;
+import eu.h2020.symbiote.model.cim.PrimitiveDatatype;
 import eu.h2020.symbiote.model.cim.Service;
 import eu.h2020.symbiote.model.cim.WGS84Location;
 import eu.h2020.symbiote.rapplugin.messaging.rap.InvokingServiceListener;
@@ -115,8 +117,8 @@ public class PoiLogic implements ProcessingLogic {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
 		cloudResource.setPluginId(props.getEnablerName());
-		// cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
-
+		//cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
+		
 		Service service = new Service();
 		cloudResource.setResource(service);
 		service.setInterworkingServiceURL(interworkingInterfaceUrl + "/");
@@ -124,21 +126,33 @@ public class PoiLogic implements ProcessingLogic {
 		service.setDescription(new LinkedList<>());
 		service.setName("PointOfInterestSearch");
 
+		PrimitiveDatatype datatypeDouble = new PrimitiveDatatype();
+		datatypeDouble.setArray(false);
+		datatypeDouble.setBaseDatatype("http://www.w3.org/2001/XMLSchema#double");
+		
 		Parameter parameter1 = new Parameter();
 		parameter1.setMandatory(true);
 		parameter1.setName("latitude");
+		parameter1.setDatatype(datatypeDouble);
 
 		Parameter parameter2 = new Parameter();
 		parameter2.setMandatory(true);
 		parameter2.setName("longitude");
+		parameter2.setDatatype(datatypeDouble);
 
 		Parameter parameter3 = new Parameter();
 		parameter3.setMandatory(true);
 		parameter3.setName("radius");
+		parameter3.setDatatype(datatypeDouble);
 
+		PrimitiveDatatype datatypeString = new PrimitiveDatatype();
+		datatypeString.setArray(false);
+		datatypeString.setBaseDatatype("http://www.w3.org/2001/XMLSchema#string");
+		
 		Parameter parameter4 = new Parameter();
 		parameter4.setMandatory(true);
 		parameter4.setName("amenity");
+		parameter4.setDatatype(datatypeString);
 		
 		service.setDescription(Arrays.asList("poi service"));
 		log.info("added service description and parameters..");
