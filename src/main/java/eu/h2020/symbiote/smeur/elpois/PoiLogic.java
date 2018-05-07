@@ -37,6 +37,7 @@ import eu.h2020.symbiote.enablerlogic.ProcessingLogic;
 import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService;
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.model.cim.Datatype;
+import eu.h2020.symbiote.model.cim.LengthRestriction;
 import eu.h2020.symbiote.model.cim.ObservationValue;
 import eu.h2020.symbiote.model.cim.Parameter;
 import eu.h2020.symbiote.model.cim.PrimitiveDatatype;
@@ -117,7 +118,6 @@ public class PoiLogic implements ProcessingLogic {
 		CloudResource cloudResource = new CloudResource();
 		cloudResource.setInternalId(internalId);
 		cloudResource.setPluginId(props.getEnablerName());
-		//cloudResource.setCloudMonitoringHost("cloudMonitoringHostIP");
 		
 		Service service = new Service();
 		cloudResource.setResource(service);
@@ -148,7 +148,7 @@ public class PoiLogic implements ProcessingLogic {
 		PrimitiveDatatype datatypeString = new PrimitiveDatatype();
 		datatypeString.setArray(false);
 		datatypeString.setBaseDatatype("http://www.w3.org/2001/XMLSchema#string");
-		
+
 		Parameter parameter4 = new Parameter();
 		parameter4.setMandatory(true);
 		parameter4.setName("amenity");
