@@ -32,8 +32,6 @@ public class OpenStreetMapApiTest {
 			assertNotNull(instance1);
 			PoiLogicTest poiTest = new PoiLogicTest();
 
-			// assert expected XML received (service
-			// works)poiTest.getFile("osmresponse.xml")
 			final Diff documentDiff = DiffBuilder.compare(poiTest.getFile("osmresponse2.xml")).withTest(instance1)
 					.withNodeFilter(node -> !node.getNodeName().equals("meta")).build();
 			assertFalse(documentDiff.hasDifferences());
