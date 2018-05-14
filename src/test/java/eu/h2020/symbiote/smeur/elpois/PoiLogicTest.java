@@ -148,5 +148,20 @@ public class PoiLogicTest {
 		}
 		return result.toString();
 	}
+	
+	@Test
+	public void testParseInitXml() {
+
+		assertNotNull(getFile("osmResponse.xml"));
+
+		List<DomainSpecificInterfaceResponse> dsiResponse = poi.parseInitXml(getFile("osmResponse.xml"));
+		assertEquals(3, dsiResponse.size());
+		
+		assertEquals("hospital", dsiResponse.get(0).getAmenity());
+		assertEquals("1349390241", dsiResponse.get(0).getId());
+		assertEquals("43.5063291", dsiResponse.get(0).getLatitude());
+		assertEquals("16.4603236", dsiResponse.get(0).getLongitude());
+		assertEquals("Ambulanta Blatine", dsiResponse.get(0).getName());
+	}
 
 }
