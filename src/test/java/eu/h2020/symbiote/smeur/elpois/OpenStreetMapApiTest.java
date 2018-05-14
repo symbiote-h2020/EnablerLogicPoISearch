@@ -21,7 +21,6 @@ public class OpenStreetMapApiTest {
 
 	String overpassURL1 = "http://overpass-api.de/api/xapi";
 	String overpassURL2 = "http://api.openstreetmap.fr/oapi/xapi";
-	String overpassURL3 = "http://overpass.osm.rambler.ru/cgi/xapi";
 	String dummyRequestParameters = "?node[amenity=hospital][bbox=16.41223,43.49439,16.50218,43.53498]";
 
 	@Test
@@ -62,24 +61,6 @@ public class OpenStreetMapApiTest {
 	}
 
 	@Test
-	public void TestReceivingResponseURL3() {
-		try {
-			String instance3 = PoiLogic.sendGetHttpRequest(overpassURL3 + dummyRequestParameters);
-
-			// assert response received
-			assertNotNull(instance3);
-			PoiLogicTest poiTest = new PoiLogicTest();
-
-			// assert expected XML received (service works)
-			final Diff documentDiff = DiffBuilder.compare(poiTest.getFile("osmresponse2.xml")).withTest(instance3)
-					.withNodeFilter(node -> !node.getNodeName().equals("meta")).build();
-			assertFalse(documentDiff.hasDifferences());
-		} catch (Exception e) {
-			System.out.println("Exception thrown on URL3 testing!");
-		}
-	}
-
-	@Test
 	public void testResultParsingLatitudeLongitude() {
 		String response = null;
 
@@ -111,7 +92,7 @@ public class OpenStreetMapApiTest {
 		String response = null;
 
 		try {
-			response = PoiLogic.sendGetHttpRequest(overpassURL3 + dummyRequestParameters);
+			response = PoiLogic.sendGetHttpRequest(overpassURL1 + dummyRequestParameters);
 		} catch (Exception e) {
 			System.out.println("Response not received while testing parsing of result!");
 			e.printStackTrace();
@@ -134,7 +115,7 @@ public class OpenStreetMapApiTest {
 			}
 			assertTrue(nameExists);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }
