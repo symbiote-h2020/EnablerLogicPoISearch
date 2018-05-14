@@ -382,26 +382,30 @@ public class PoiLogic implements ProcessingLogic {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String sendGetHttpRequest(String address) throws Exception {
+	public static String sendGetHttpRequest(String address){
 		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 		factory.setConnectTimeout(5000);
 		factory.setReadTimeout(10000);
-		URI uri = new URI(address);
-		HttpMethod method = HttpMethod.GET;
-		ClientHttpRequest request = factory.createRequest(uri, method);
-		ClientHttpResponse response = request.execute();
-
-		BufferedReader rdr = new BufferedReader(new InputStreamReader(response.getBody()));
-
-		StringBuilder builder = new StringBuilder();
-		String responseString = "";
-
-		while ((responseString = rdr.readLine()) != null) {
-			builder.append(responseString);
+		try{
+			URI uri = new URI(address);
+			HttpMethod method = HttpMethod.GET;
+			ClientHttpRequest request = factory.createRequest(uri, method);
+			ClientHttpResponse response = request.execute();
+			BufferedReader rdr = new BufferedReader(new InputStreamReader(response.getBody()));
+	
+			StringBuilder builder = new StringBuilder();
+			String responseString = "";
+	
+			while ((responseString = rdr.readLine()) != null) {
+				builder.append(responseString);
+			}
+	
+			String result = builder.toString();
+			return result;
+			}
+		catch(Exception e){
+			return null;
 		}
-
-		String result = builder.toString();
-		return result;
 	}
 
 }
